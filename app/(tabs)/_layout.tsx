@@ -19,27 +19,25 @@ const AnimatedTabBarButton = ({
 }: BottomTabBarButtonProps) => {
   const scaleValue = useRef(new Animated.Value(1)).current;
 
-  const handlePressIn = () => {
-    Animated.spring(scaleValue, {
-      toValue: 10,
-      useNativeDriver: true,
-      friction: 1, // Adjust for desired springiness
-    }).start();
-  };
-
   const handlePressOut = () => {
-    Animated.spring(scaleValue, {
-      toValue: 1,
-      useNativeDriver: true,
-      friction: 4,
-    }).start();
+    Animated.sequence([
+      Animated.spring(scaleValue, {
+        toValue: 1.2,
+        useNativeDriver: true,
+        speed: 200,
+      }),
+      Animated.spring(scaleValue, {
+        toValue: 1,
+        useNativeDriver: true,
+        speed: 200,
+      }),
+    ]).start();
   };
 
   return (
     <Pressable
       {...restProps}
       onPress={onPress}
-      onPressIn={handlePressIn}
       onPressOut={handlePressOut}
       style={[
         { flex: 1, justifyContent: "center", alignItems: "center" },
