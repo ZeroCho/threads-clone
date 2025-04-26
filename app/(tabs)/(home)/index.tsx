@@ -1,13 +1,26 @@
-import { Text, View, TouchableOpacity, StyleSheet, Image } from "react-native";
+import {
+  Text,
+  View,
+  TouchableOpacity,
+  StyleSheet,
+  Image,
+  Pressable,
+} from "react-native";
 import { usePathname, useRouter } from "expo-router";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { BlurView } from "expo-blur";
+import { AuthContext } from "../../_layout";
+import { useContext, useState } from "react";
+import { Ionicons } from "@expo/vector-icons";
+import SideMenu from "@/components/SideMenu";
 
 export default function Index() {
   const router = useRouter();
   const pathname = usePathname();
   const insets = useSafeAreaInsets();
-  const isLoggedIn = false;
+  const [isSideMenuOpen, setIsSideMenuOpen] = useState(false);
+  const { user, logout } = useContext(AuthContext);
+  const isLoggedIn = !!user;
 
   return (
     <View
@@ -17,6 +30,20 @@ export default function Index() {
       ]}
     >
       <BlurView style={styles.header} intensity={70}>
+        {isLoggedIn && (
+          <Pressable
+            style={styles.menuButton}
+            onPress={() => {
+              setIsSideMenuOpen(true);
+            }}
+          >
+            <Ionicons name="menu" size={24} color="black" />
+          </Pressable>
+        )}
+        <SideMenu
+          isVisible={isSideMenuOpen}
+          onClose={() => setIsSideMenuOpen(false)}
+        />
         <Image
           source={require("../../../assets/images/react-logo.png")}
           style={styles.headerLogo}
@@ -101,5 +128,10 @@ const styles = StyleSheet.create({
   },
   loginButtonText: {
     color: "white",
+  },
+  menuButton: {
+    position: "absolute",
+    left: 20,
+    top: 10,
   },
 });

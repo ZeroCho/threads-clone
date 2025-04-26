@@ -1,6 +1,6 @@
 {
   "name": "threads-clone",
-  "main": "expo-router/entry",
+  "main": "index.ts",
   "version": "1.0.0",
   "scripts": {
     "start": "expo start",
@@ -24,13 +24,17 @@
     "expo-constants": "~17.1.2",
     "expo-font": "~13.1.2",
     "expo-haptics": "~14.1.2",
+    "expo-image-picker": "~16.1.2",
     "expo-linking": "~7.1.2",
+    "expo-location": "~18.1.2",
+    "expo-media-library": "~17.1.3",
     "expo-router": "~5.0.2-preview.4",
     "expo-splash-screen": "~0.30.4",
     "expo-status-bar": "~2.2.1",
     "expo-symbols": "~0.4.2",
     "expo-system-ui": "~5.0.3",
     "expo-web-browser": "~14.1.3",
+    "miragejs": "^0.1.48",
     "react": "19.0.0",
     "react-dom": "19.0.0",
     "react-native": "0.79.0",
@@ -40,9 +44,8 @@
     "react-native-screens": "~4.10.0",
     "react-native-web": "~0.20.0",
     "react-native-webview": "13.13.5",
-    "expo-location": "~18.1.2",
-    "expo-image-picker": "~16.1.2",
-    "expo-media-library": "~17.1.3"
+    "@react-native-async-storage/async-storage": "2.1.2",
+    "expo-secure-store": "~14.2.2"
   },
   "devDependencies": {
     "@babel/core": "^7.25.2",
