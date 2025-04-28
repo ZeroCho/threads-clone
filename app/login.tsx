@@ -1,12 +1,18 @@
 import { Redirect, router } from "expo-router";
-import { View, Text, Pressable, StyleSheet, Alert } from "react-native";
+import {
+  View,
+  Text,
+  Pressable,
+  StyleSheet,
+  Alert,
+  useColorScheme,
+} from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import * as SecureStore from "expo-secure-store";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import { AuthContext } from "./_layout";
 import { useContext } from "react";
 
 export default function Login() {
+  const colorScheme = useColorScheme();
   const insets = useSafeAreaInsets();
   const { user, login } = useContext(AuthContext);
   const isLoggedIn = !!user;
@@ -15,7 +21,15 @@ export default function Login() {
     return <Redirect href="/(tabs)" />;
   }
   return (
-    <View style={{ paddingTop: insets.top }}>
+    <View
+      style={{
+        flex: 1,
+        justifyContent: "center",
+        alignItems: "center",
+        paddingTop: insets.top,
+        backgroundColor: colorScheme === "dark" ? "black" : "white",
+      }}
+    >
       <Pressable onPress={() => router.back()}>
         <Text>Back</Text>
       </Pressable>
