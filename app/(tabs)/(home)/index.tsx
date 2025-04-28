@@ -23,61 +23,7 @@ export default function Index() {
   const isLoggedIn = !!user;
 
   return (
-    <View
-      style={[
-        styles.container,
-        { paddingTop: insets.top, paddingBottom: insets.bottom },
-      ]}
-    >
-      <BlurView style={styles.header} intensity={70}>
-        {isLoggedIn && (
-          <Pressable
-            style={styles.menuButton}
-            onPress={() => {
-              setIsSideMenuOpen(true);
-            }}
-          >
-            <Ionicons name="menu" size={24} color="black" />
-          </Pressable>
-        )}
-        <SideMenu
-          isVisible={isSideMenuOpen}
-          onClose={() => setIsSideMenuOpen(false)}
-        />
-        <Image
-          source={require("../../../assets/images/react-logo.png")}
-          style={styles.headerLogo}
-        />
-        {!isLoggedIn && (
-          <TouchableOpacity
-            style={styles.loginButton}
-            onPress={() => {
-              console.log("loginButton onPress");
-              router.navigate(`/login`);
-            }}
-          >
-            <Text style={styles.loginButtonText}>로그인</Text>
-          </TouchableOpacity>
-        )}
-      </BlurView>
-      {isLoggedIn && (
-        <View style={styles.tabContainer}>
-          <View style={styles.tab}>
-            <TouchableOpacity onPress={() => router.navigate(`/`)}>
-              <Text style={{ color: pathname === "/" ? "red" : "black" }}>
-                For you
-              </Text>
-            </TouchableOpacity>
-          </View>
-          <View style={styles.tab}>
-            <TouchableOpacity onPress={() => router.navigate(`/following`)}>
-              <Text style={{ color: pathname === "/" ? "black" : "red" }}>
-                Following
-              </Text>
-            </TouchableOpacity>
-          </View>
-        </View>
-      )}
+    <View>
       <View>
         <TouchableOpacity onPress={() => router.push(`/@zerocho/post/1`)}>
           <Text>게시글1</Text>
