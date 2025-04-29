@@ -3,6 +3,7 @@ import { Stack } from "expo-router";
 import { createContext, useContext, useEffect, useState } from "react";
 import { Alert } from "react-native";
 import * as SecureStore from "expo-secure-store";
+import { StatusBar } from "expo-status-bar";
 
 export interface User {
   id: string;
@@ -77,6 +78,7 @@ export default function RootLayout() {
 
   return (
     <AuthContext value={{ user, login, logout, updateUser }}>
+      <StatusBar style="auto" animated hidden={false} />
       <Stack screenOptions={{ headerShown: false }}>
         <Stack.Screen name="(tabs)" />
         <Stack.Screen name="modal" options={{ presentation: "modal" }} />
