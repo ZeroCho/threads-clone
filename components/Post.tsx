@@ -8,7 +8,11 @@ import {
   Share,
   useColorScheme,
   Image,
+  Pressable,
+  Linking,
+  ScrollView,
 } from "react-native";
+import * as WebBrowser from "expo-web-browser";
 
 export interface Post {
   id: string;
@@ -21,7 +25,9 @@ export interface Post {
   reposts: number;
   isVerified?: boolean;
   avatar?: string;
-  image?: string;
+  images?: string[];
+  link?: string;
+  linkThumbnail?: string;
   location?: [number, number];
 }
 
@@ -50,6 +56,7 @@ export default function Post({ item }: { item: Post }) {
 
   // 게시글 클릭 핸들러 수정
   const handlePostPress = (post: Post) => {
+    console.log("postClick");
     // DetailedPost 타입에 맞게 데이터 변환 (isLiked, shares는 상세 화면에서 관리)
     const detailedPost: DetailedPost = {
       ...post,
@@ -121,7 +128,7 @@ export default function Post({ item }: { item: Post }) {
         </View>
       </View>
 
-      <View style={styles.postContent}>
+      <View style={styles.postContent} pointerEvents="box-none">
         <Text
           style={[
             styles.postText,
@@ -130,12 +137,34 @@ export default function Post({ item }: { item: Post }) {
         >
           {item.content}
         </Text>
-        {item.image && (
-          <Image
-            source={{ uri: item.image }}
-            style={styles.postImage}
-            resizeMode="cover"
-          />
+        <View pointerEvents="box-none">
+          <ScrollView
+            pointerEvents="box-only"
+            horizontal
+            scrollEnabled
+            nestedScrollEnabled
+            contentContainerStyle={styles.postImages}
+          >
+            {item.images &&
+              item.images.length > 0 &&
+              item.images.map((image) => (
+                <Image
+                  key={image}
+                  source={{ uri: image }}
+                  style={styles.postImage}
+                  resizeMode="cover"
+                />
+              ))}
+          </ScrollView>
+        </View>
+        {!item.images?.length && item.link && (
+          <Pressable onPress={() => WebBrowser.openBrowserAsync(item.link!)}>
+            <Image
+              source={{ uri: item.linkThumbnail }}
+              style={styles.postLink}
+              resizeMode="cover"
+            />
+          </Pressable>
         )}
         {item.location && item.location.length > 0 && (
           <Text style={styles.postText}>{item.location.join(", ")}</Text>
@@ -242,9 +271,19 @@ const styles = StyleSheet.create({
   postTextLight: {
     color: "#000",
   },
+  postImages: {
+    flexDirection: "row",
+    gap: 8,
+  },
   postImage: {
-    width: "100%",
+    width: 300,
     height: 300,
+    borderRadius: 12,
+    marginTop: 8,
+  },
+  postLink: {
+    width: "85%",
+    height: 200,
     borderRadius: 12,
     marginTop: 8,
   },
