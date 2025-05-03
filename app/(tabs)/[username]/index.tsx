@@ -6,15 +6,33 @@ import {
   Pressable,
   Image,
 } from "react-native";
-import { usePathname } from "expo-router";
-import { useContext } from "react";
+import { usePathname, useLocalSearchParams } from "expo-router";
+import { useContext, useState } from "react";
 import { AuthContext } from "@/app/_layout";
+import { FlashList } from "@shopify/flash-list";
+import Post from "@/components/Post";
 
 export default function Index() {
   const colorScheme = useColorScheme();
   const pathname = usePathname();
+  const { username } = useLocalSearchParams();
   console.log(pathname);
   const { user } = useContext(AuthContext);
+  const [threads, setThreads] = useState<any[]>([]);
+
+  const onEndReached = () => {
+    console.log(
+      "onEndReached",
+      `/users/${username?.slice(1)}/threads?cursor=${threads.at(-1)?.id}`
+    );
+    fetch(`/users/${username?.slice(1)}/threads?cursor=${threads.at(-1)?.id}`)
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.posts.length > 0) {
+          setThreads((prev) => [...prev, ...data.posts]);
+        }
+      });
+  };
 
   return (
     <View
@@ -23,7 +41,7 @@ export default function Index() {
         colorScheme === "dark" ? styles.containerDark : styles.containerLight,
       ]}
     >
-      {pathname === "/undefined" && (
+      {pathname === "/@" + user?.id && (
         <View style={styles.postInputContainer}>
           <Image
             source={{ uri: user?.profileImageUrl }}
@@ -59,6 +77,13 @@ export default function Index() {
           </Pressable>
         </View>
       )}
+      <FlashList
+        data={threads}
+        renderItem={({ item }) => <Post item={item} />}
+        onEndReached={onEndReached}
+        onEndReachedThreshold={2}
+        estimatedItemSize={350}
+      />
     </View>
   );
 }

@@ -19,7 +19,7 @@ declare global {
   }
 }
 
-let zerocho: User;
+let zerocho;
 
 if (__DEV__) {
   if (window.server) {
@@ -65,7 +65,7 @@ if (__DEV__) {
         content: () => faker.lorem.paragraph(),
         imageUrls: () =>
           Array.from({ length: Math.floor(Math.random() * 3) }, () =>
-            faker.image.urlLoremFlickr()
+            faker.image.urlLoremFlickr({ category: "nature" })
           ),
         likes: () => Math.floor(Math.random() * 100),
         comments: () => Math.floor(Math.random() * 100),
@@ -85,6 +85,9 @@ if (__DEV__) {
           user,
         });
       });
+      server.createList("post", 5, {
+        user: zerocho,
+      });
     },
     routes() {
       this.post("/posts", (schema, request) => {
@@ -97,20 +100,45 @@ if (__DEV__) {
             user: schema.find("user", "zerohch0"),
           });
         });
-        return new Response(200, {}, { posts });
+        return posts;
       });
 
       this.get("/posts", (schema, request) => {
-        console.log("user.all", schema.all("user").models);
-        const cursor = parseInt((request.queryParams.cursor as string) || "0");
-        const posts = schema.all("post").models.slice(cursor, cursor + 10);
-        return new Response(200, {}, { posts });
+        console.log("request", request.queryParams);
+        let posts = schema.all("post");
+        if (request.queryParams.type === "following") {
+          posts = posts.filter((post) => post.user?.id === zerocho?.id);
+        }
+        let targetIndex = -1;
+        if (request.queryParams.cursor) {
+          targetIndex = posts.models.findIndex(
+            (v) => v.id === request.queryParams.cursor
+          );
+        }
+        return posts.slice(targetIndex + 1, targetIndex + 11);
       });
 
       this.get("/posts/:id", (schema, request) => {
         const post = schema.find("post", request.params.id);
-        const comments = schema.all("post").models.slice(0, 10);
-        return new Response(200, {}, { post, comments });
+        const comments = schema.all("post").slice(0, 10);
+        return { post, comments };
+      });
+
+      this.get("/users/:id/:type", (schema, request) => {
+        console.log("request", request.queryParams);
+        let posts = schema.all("post");
+        if (request.params.type === "threads") {
+          posts = posts.filter((post) => post.user?.id === request.params.id);
+        } else if (request.params.type === "reposts") {
+          posts = posts.filter((post) => post.user?.id !== request.params.id);
+        }
+        let targetIndex = -1;
+        if (request.queryParams.cursor) {
+          targetIndex = posts.models.findIndex(
+            (v) => v.id === request.queryParams.cursor
+          );
+        }
+        return posts.slice(targetIndex + 1, targetIndex + 11);
       });
 
       this.post("/login", (schema, request) => {
