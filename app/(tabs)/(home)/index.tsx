@@ -1,12 +1,14 @@
 import { View, StyleSheet, useColorScheme } from "react-native";
 import { usePathname } from "expo-router";
 import Post, { type Post as PostType } from "@/components/Post";
+import * as Haptics from "expo-haptics";
 import { FlashList } from "@shopify/flash-list";
 import { useCallback, useEffect, useState } from "react";
 
 export default function Index() {
   const colorScheme = useColorScheme();
   const path = usePathname();
+  const [refreshing, setRefreshing] = useState(false);
   const [posts, setPosts] = useState<PostType[]>([]);
   console.log("posts", posts.length);
 
@@ -21,6 +23,20 @@ export default function Index() {
       });
   }, [posts, path]);
 
+  const onRefresh = () => {
+    setRefreshing(true);
+    setPosts([]);
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    fetch("/posts")
+      .then((res) => res.json())
+      .then((data) => {
+        setPosts(data.posts);
+      })
+      .finally(() => {
+        setRefreshing(false);
+      });
+  };
+
   return (
     <View
       style={[
@@ -30,6 +46,8 @@ export default function Index() {
     >
       <FlashList
         data={posts}
+        onRefresh={onRefresh}
+        refreshing={refreshing}
         renderItem={({ item }) => <Post item={item} />}
         onEndReached={onEndReached}
         onEndReachedThreshold={2}
