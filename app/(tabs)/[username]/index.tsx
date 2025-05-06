@@ -6,19 +6,74 @@ import {
   Pressable,
   Image,
 } from "react-native";
-import { usePathname, useLocalSearchParams } from "expo-router";
-import { useContext, useState } from "react";
+import { usePathname, useLocalSearchParams, router } from "expo-router";
+import { useContext, useEffect, useState } from "react";
 import { AuthContext } from "@/app/_layout";
 import { FlashList } from "@shopify/flash-list";
 import Post from "@/components/Post";
+
+const Header = () => {
+  const { user } = useContext(AuthContext);
+  const colorScheme = useColorScheme();
+  const pathname = usePathname();
+
+  return pathname === "/@" + user?.id ? (
+    <View style={styles.postInputContainer}>
+      <Image
+        source={{ uri: user?.profileImageUrl }}
+        style={styles.profileAvatar}
+      />
+      <Text
+        style={
+          colorScheme === "dark"
+            ? styles.postInputTextDark
+            : styles.postInputTextLight
+        }
+      >
+        What's new?
+      </Text>
+      <Pressable
+        onPress={() => {
+          router.navigate("/modal");
+        }}
+        style={[
+          styles.postButton,
+          colorScheme === "dark"
+            ? styles.postButtonDark
+            : styles.postButtonLight,
+        ]}
+      >
+        <Text
+          style={[
+            styles.postButtonText,
+            colorScheme === "dark"
+              ? styles.postButtonTextDark
+              : styles.postButtonTextLight,
+          ]}
+        >
+          Post
+        </Text>
+      </Pressable>
+    </View>
+  ) : null;
+};
 
 export default function Index() {
   const colorScheme = useColorScheme();
   const pathname = usePathname();
   const { username } = useLocalSearchParams();
-  console.log(pathname);
+  console.log("[username] pathname", pathname);
   const { user } = useContext(AuthContext);
   const [threads, setThreads] = useState<any[]>([]);
+
+  useEffect(() => {
+    setThreads([]);
+    fetch(`/users/${username?.slice(1)}/threads`)
+      .then((res) => res.json())
+      .then((data) => {
+        setThreads(data.posts);
+      });
+  }, [username]);
 
   const onEndReached = () => {
     console.log(
@@ -41,44 +96,9 @@ export default function Index() {
         colorScheme === "dark" ? styles.containerDark : styles.containerLight,
       ]}
     >
-      {pathname === "/@" + user?.id && (
-        <View style={styles.postInputContainer}>
-          <Image
-            source={{ uri: user?.profileImageUrl }}
-            style={styles.profileAvatar}
-          />
-          <Text
-            style={
-              colorScheme === "dark"
-                ? styles.postInputTextDark
-                : styles.postInputTextLight
-            }
-          >
-            What's new?
-          </Text>
-          <Pressable
-            style={[
-              styles.postButton,
-              colorScheme === "dark"
-                ? styles.postButtonDark
-                : styles.postButtonLight,
-            ]}
-          >
-            <Text
-              style={[
-                styles.postButtonText,
-                colorScheme === "dark"
-                  ? styles.postButtonTextDark
-                  : styles.postButtonTextLight,
-              ]}
-            >
-              Post
-            </Text>
-          </Pressable>
-        </View>
-      )}
       <FlashList
         data={threads}
+        ListHeaderComponent={<Header />}
         renderItem={({ item }) => <Post item={item} />}
         onEndReached={onEndReached}
         onEndReachedThreshold={2}
