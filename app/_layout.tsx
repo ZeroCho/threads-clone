@@ -7,6 +7,7 @@ import { StatusBar } from "expo-status-bar";
 import { Asset } from "expo-asset";
 import Constants from "expo-constants";
 import * as SplashScreen from "expo-splash-screen";
+import Toast, { BaseToast } from "react-native-toast-message";
 
 // Instruct SplashScreen not to hide yet, we want to do this manually
 SplashScreen.preventAutoHideAsync().catch(() => {
@@ -186,6 +187,33 @@ function AnimatedSplashScreen({
 }
 
 export default function RootLayout() {
+  const toastConfig = {
+    customToast: (props: any) => (
+      <BaseToast
+        style={{
+          backgroundColor: "white",
+          borderRadius: 20,
+          height: 40,
+          borderLeftWidth: 0,
+          shadowOpacity: 0,
+          justifyContent: "center",
+        }}
+        contentContainerStyle={{
+          paddingHorizontal: 16,
+          alignItems: "center",
+          height: 40,
+        }}
+        text1Style={{
+          color: "black",
+          fontSize: 14,
+          fontWeight: "500",
+        }}
+        text1={props.text1}
+        onPress={props.onPress}
+      />
+    ),
+  };
+
   return (
     <AnimatedAppLoader image={require("../assets/images/react-logo.png")}>
       <StatusBar style="auto" animated hidden={false} />
@@ -193,6 +221,7 @@ export default function RootLayout() {
         <Stack.Screen name="(tabs)" />
         <Stack.Screen name="modal" options={{ presentation: "modal" }} />
       </Stack>
+      <Toast config={toastConfig} />
     </AnimatedAppLoader>
   );
 }
