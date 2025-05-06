@@ -12,7 +12,7 @@ import {
 } from "miragejs";
 import { faker } from "@faker-js/faker";
 import { type User } from "./app/_layout";
-
+import * as Device from "expo-device";
 declare global {
   interface Window {
     server: Server;
@@ -21,7 +21,7 @@ declare global {
 
 let zerocho;
 
-if (__DEV__) {
+if (__DEV__ && !Device.isDevice) {
   if (window.server) {
     window.server.shutdown();
   }
