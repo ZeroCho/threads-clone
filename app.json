@@ -4,7 +4,7 @@
     "slug": "threads-clone",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/images/icon.png",
+    "icon": "./assets/images/avatar.png",
     "scheme": "threadc",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
@@ -18,7 +18,7 @@
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./assets/images/adaptive-icon.png",
+        "foregroundImage": "./assets/images/avatar.png",
         "backgroundColor": "#ffffff"
       },
       "edgeToEdgeEnabled": true,

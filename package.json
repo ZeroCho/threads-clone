@@ -18,6 +18,8 @@
     "@expo/vector-icons": "^14.1.0",
     "@faker-js/faker": "^9.7.0",
     "@react-native-async-storage/async-storage": "2.1.2",
+    "@react-native-kakao/core": "^2.4.0",
+    "@react-native-kakao/user": "^2.4.0",
     "@react-navigation/bottom-tabs": "^7.3.10",
     "@react-navigation/elements": "^2.3.8",
     "@react-navigation/material-top-tabs": "^7.2.10",
