@@ -14,7 +14,8 @@
       "bundleIdentifier": "com.zerocho.threads",
       "infoPlist": {
         "ITSAppUsesNonExemptEncryption": false
-      }
+      },
+      "runtimeVersion": "1.0.0"
     },
     "android": {
       "adaptiveIcon": {
@@ -28,10 +29,17 @@
         "android.permission.RECORD_AUDIO",
         "android.permission.READ_EXTERNAL_STORAGE",
         "android.permission.WRITE_EXTERNAL_STORAGE",
+        "android.permission.ACCESS_MEDIA_LOCATION",
+        "android.permission.ACCESS_COARSE_LOCATION",
+        "android.permission.ACCESS_FINE_LOCATION",
+        "android.permission.RECORD_AUDIO",
+        "android.permission.READ_EXTERNAL_STORAGE",
+        "android.permission.WRITE_EXTERNAL_STORAGE",
         "android.permission.ACCESS_MEDIA_LOCATION"
       ],
       "package": "com.zerocho.threads",
-      "googleServicesFile": "./google-services.json"
+      "googleServicesFile": "./google-services.json",
+      "runtimeVersion": "1.0.0"
     },
     "web": {
       "bundler": "metro",
@@ -108,9 +116,13 @@
     },
     "extra": {
       "router": {},
+      "apiUrl": "http://threads.nodebird.com",
       "eas": {
         "projectId": "ddaf49bd-3a77-4ac8-aedc-83ca210a67d2"
       }
+    },
+    "updates": {
+      "url": "https://u.expo.dev/ddaf49bd-3a77-4ac8-aedc-83ca210a67d2"
     }
   }
 }

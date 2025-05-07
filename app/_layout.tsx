@@ -10,7 +10,7 @@ import * as SplashScreen from "expo-splash-screen";
 import Toast, { BaseToast } from "react-native-toast-message";
 import * as Notifications from "expo-notifications";
 import * as Device from "expo-device";
-
+import * as Updates from "expo-updates";
 // First, set the handler that will cause the notification
 // to show the alert
 Notifications.setNotificationHandler({
@@ -160,6 +160,12 @@ function AnimatedSplashScreen({
   const { updateUser } = useContext(AuthContext);
   const [expoPushToken, setExpoPushToken] = useState<string | null>(null);
 
+  const { currentlyRunning, isUpdateAvailable, isUpdatePending } =
+    Updates.useUpdates();
+  console.log("currentlyRunning", currentlyRunning);
+  console.log("isUpdateAvailable", isUpdateAvailable);
+  console.log("isUpdatePending", isUpdatePending);
+
   useEffect(() => {
     if (isAppReady) {
       Animated.timing(animation, {
@@ -170,6 +176,29 @@ function AnimatedSplashScreen({
     }
   }, [isAppReady]);
 
+  async function onFetchUpdateAsync() {
+    try {
+      if (!__DEV__) {
+        const update = await Updates.checkForUpdateAsync();
+
+        if (update.isAvailable) {
+          await Updates.fetchUpdateAsync();
+          Alert.alert("Update available", "Please update your app", [
+            {
+              text: "Update",
+              onPress: () => Updates.reloadAsync(),
+            },
+            { text: "Cancel", style: "cancel" },
+          ]);
+        }
+      }
+    } catch (error) {
+      console.error(error);
+      // You can also add an alert() to see the error message in case of an error when fetching updates.
+      alert(`Error fetching latest Expo update: ${error}`);
+    }
+  }
+
   const onImageLoaded = async () => {
     try {
       // 데이터 준비
@@ -177,6 +206,7 @@ function AnimatedSplashScreen({
         AsyncStorage.getItem("user").then((user) => {
           updateUser?.(user ? JSON.parse(user) : null);
         }),
+        onFetchUpdateAsync(),
         // TODO: validating access token
       ]);
       await SplashScreen.hideAsync();
