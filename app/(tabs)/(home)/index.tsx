@@ -11,6 +11,7 @@ import Animated, {
   withTiming,
 } from "react-native-reanimated";
 import { AnimationContext } from "./_layout";
+import Constants from "expo-constants";
 
 const AnimatedFlashList = Animated.createAnimatedComponent(FlashList<PostType>);
 
@@ -24,7 +25,9 @@ export default function Index() {
 
   const onEndReached = useCallback(() => {
     console.log("onEndReached", posts.at(-1)?.id);
-    fetch(`/posts?cursor=${posts.at(-1)?.id}`)
+    fetch(
+      `${Constants.expoConfig?.extra?.apiUrl}/posts?cursor=${posts.at(-1)?.id}`
+    )
       .then((res) => res.json())
       .then((data) => {
         if (data.posts.length > 0) {
@@ -36,7 +39,7 @@ export default function Index() {
   const onRefresh = (done: () => void) => {
     setPosts([]);
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-    fetch("/posts")
+    fetch(`${Constants.expoConfig?.extra?.apiUrl}/posts`)
       .then((res) => res.json())
       .then((data) => {
         setPosts(data.posts);
