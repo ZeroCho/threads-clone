@@ -1,5 +1,5 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { Stack } from "expo-router";
+import { Href, Stack } from "expo-router";
 import { createContext, useContext, useEffect, useRef, useState } from "react";
 import { Alert, View, StyleSheet, Animated, Linking } from "react-native";
 import * as SecureStore from "expo-secure-store";
@@ -11,6 +11,7 @@ import Toast, { BaseToast } from "react-native-toast-message";
 import * as Notifications from "expo-notifications";
 import * as Device from "expo-device";
 import * as Updates from "expo-updates";
+import { router } from "expo-router";
 // First, set the handler that will cause the notification
 // to show the alert
 Notifications.setNotificationHandler({
@@ -231,6 +232,7 @@ function AnimatedSplashScreen({
 
   useEffect(() => {
     if (expoPushToken && Device.isDevice) {
+      Alert.alert("sendPushNotification", expoPushToken);
       sendPushNotification(expoPushToken);
     }
   }, [expoPushToken]);
@@ -274,7 +276,42 @@ function AnimatedSplashScreen({
   );
 }
 
+function useNotificationObserver() {
+  useEffect(() => {
+    let isMounted = true;
+
+    function redirect(notification: Notifications.Notification) {
+      const url = notification.request.content.data?.url as string;
+      if (url && url.startsWith("threadc://")) {
+        Alert.alert("redirect to url", url);
+        router.push(url.replace("threadc://", "/") as Href); // threadc://@zerocho -> /@zerocho
+        // Linking.openURL(url);
+      }
+    }
+
+    Notifications.getLastNotificationResponseAsync().then((response) => {
+      if (!isMounted || !response?.notification) {
+        return;
+      }
+      redirect(response?.notification);
+    });
+
+    const subscription = Notifications.addNotificationResponseReceivedListener(
+      (response) => {
+        redirect(response.notification);
+      }
+    );
+
+    return () => {
+      isMounted = false;
+      subscription.remove();
+    };
+  }, []);
+}
+
 export default function RootLayout() {
+  useNotificationObserver();
+
   const toastConfig = {
     customToast: (props: any) => (
       <BaseToast
