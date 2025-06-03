@@ -1,4 +1,10 @@
-import React, { useState, useRef, useEffect, useCallback } from "react";
+import React, {
+  useState,
+  useRef,
+  useEffect,
+  useCallback,
+  useContext,
+} from "react";
 import {
   View,
   Text,
@@ -20,6 +26,9 @@ import * as Location from "expo-location";
 import * as ImagePicker from "expo-image-picker";
 import * as MediaLibrary from "expo-media-library";
 import Toast from "react-native-toast-message";
+import { EventEmitter } from "expo-modules-core";
+import BackgroundUploaderModule from "../modules/background-uploader";
+import { AuthContext } from "./_layout";
 
 interface Thread {
   id: string;
@@ -65,6 +74,7 @@ export default function Modal() {
   const [replyOption, setReplyOption] = useState("Anyone");
   const [isDropdownVisible, setIsDropdownVisible] = useState(false);
   const [isPosting, setIsPosting] = useState(false);
+  const { user, login } = useContext(AuthContext);
 
   const replyOptions = ["Anyone", "Profiles you follow", "Mentioned only"];
 
@@ -73,69 +83,38 @@ export default function Modal() {
     router.back();
   };
 
+  useEffect(() => {
+    const emitter = new EventEmitter<Record<string, any>>();
+    const sub = emitter.addListener(
+      "uploadFinished",
+      (data: { id: string; success: boolean }) => {
+        console.log("uploadFinished", data);
+        if (data.success) {
+          console.log("uploadFinished", data);
+          Toast.hide();
+          Toast.show({
+            text1: "Post posted",
+            type: "customToast",
+            visibilityTime: 5000,
+            position: "bottom",
+            bottomOffset: 20,
+            onPress: () => {
+              console.log("post pressed", data);
+              router.replace(`/@${user?.id}/post/${data.id}`);
+              Toast.hide();
+            },
+          });
+        }
+      }
+    );
+    return () => {
+      sub.remove();
+    };
+  }, []);
+
   const handlePost = () => {
     console.log("handlePost", threads);
-    const formData = new FormData();
-    threads.forEach((thread, index) => {
-      formData.append(`posts[${index}][id]`, thread.id);
-      formData.append(`posts[${index}][content]`, thread.text);
-      formData.append(`posts[${index}][userId]`, "zerohch0");
-      formData.append(
-        `posts[${index}][location]`,
-        JSON.stringify(thread.location)
-      );
-      thread.imageUrls.forEach((imageUrl, imageIndex) => {
-        formData.append(`posts[${index}][imageUrls][${imageIndex}]`, {
-          uri: imageUrl,
-          name: `image_${index}_${imageIndex}.jpeg`,
-          type: "image/jpeg",
-        } as unknown as Blob);
-      });
-    });
-
-    Toast.show({
-      text1: "Posting...",
-      type: "customToast",
-      visibilityTime: 5000,
-      position: "bottom",
-      bottomOffset: 20,
-    });
-
-    fetch("/posts", {
-      method: "POST",
-      headers: {
-        "Content-Type": "multipart/form-data",
-      },
-      body: formData,
-    })
-      .then((res) => res.json())
-      .then((data) => {
-        console.log("post result", data);
-        Toast.hide();
-        Toast.show({
-          text1: "Post posted",
-          type: "customToast",
-          visibilityTime: 5000,
-          position: "bottom",
-          bottomOffset: 20,
-          onPress: () => {
-            console.log("post pressed", data);
-            router.replace(`/@${data[0].userId}/post/${data[0].id}`);
-            Toast.hide();
-          },
-        });
-      })
-      .catch((err) => {
-        console.error("post error", err);
-        Toast.hide();
-        Toast.show({
-          text1: "Post failed",
-          type: "customToast",
-          visibilityTime: 5000,
-          position: "bottom",
-          bottomOffset: 20,
-        });
-      });
+    BackgroundUploaderModule.startUpload(JSON.stringify(threads));
   };
 
   const updateThreadText = (id: string, text: string) => {

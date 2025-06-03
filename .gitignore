@@ -37,5 +37,9 @@ yarn-error.*
 *.tsbuildinfo
 
 app-example
-google-services.json
-threads-clone-*.json
+local.properties
+/android
+/ios
+.gradle
+.idea
+modules/background-uploader/android/build
